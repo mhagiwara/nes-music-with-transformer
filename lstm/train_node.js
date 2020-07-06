@@ -119,6 +119,7 @@ async function main() {
                 
     if (args.savePath != null && args.savePath.length > 0) {
         await model.save(`file://${args.savePath}`);
+        fs.writeFileSync(`${args.savePath}/vocab.json`, JSON.stringify(dataSet.vocabulary_));
         console.log(`Saved model to ${args.savePath}`);
     }
 }
