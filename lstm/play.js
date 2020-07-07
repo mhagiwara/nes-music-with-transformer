@@ -1,4 +1,4 @@
-function segment_music(music) {
+export function segment_music(music) {
     var frame = {};
     var segmented = [];
     for (var i = 0; i < music.length; i ++) {
@@ -15,7 +15,7 @@ function segment_music(music) {
     return segmented;
 };
 
-function schedule(segmented) {
+export function schedule(segmented) {
     var frame_in_seconds = 1.0 / 24;
     var synths = {
         'p1': new Tone.Synth({oscillator: {type: 'square'}}).toMaster(),
@@ -89,8 +89,3 @@ function schedule(segmented) {
         });
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelector('tone-play-toggle').addEventListener('change', e => Tone.Transport.toggle());
-    schedule(segment_music(music));
-});

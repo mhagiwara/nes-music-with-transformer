@@ -109,7 +109,7 @@ export async function generateText(
   // Avoid overwriting the original input.
   sentenceIndices = sentenceIndices.slice();
 
-  let generated = '';
+  let generated = [];
   while (generated.length < length) {
     // Encode the current input sequence as a one-hot Tensor.
     const inputBuffer =
@@ -132,7 +132,7 @@ export async function generateText(
       await onTextGenerationChar(winnerChar);
     }
 
-    generated += winnerChar;
+    generated.push(winnerChar);
     sentenceIndices = sentenceIndices.slice(1);
     sentenceIndices.push(winnerIndex);
 
