@@ -1,7 +1,3 @@
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function segment_music(music) {
     var frame = {};
     var segmented = [];
@@ -19,7 +15,7 @@ function segment_music(music) {
     return segmented;
 };
 
-function play(segmented) {
+function schedule(segmented) {
     var frame_in_seconds = 1.0 / 24;
     var synths = {
         'p1': new Tone.Synth({oscillator: {type: 'square'}}).toMaster(),
@@ -46,16 +42,26 @@ function play(segmented) {
         'no': undefined
     };
 
-    function _play_note(part, note, length, position) {
+    function _schedule_note(part, note, length, position) {
         if (part == 'no') {
-            synths[part].triggerAttackRelease(
-                length * frame_in_seconds,    // length
-                1 + position * frame_in_seconds);    // position   
+            Tone.Transport.schedule(
+                function (time) {
+                    synths[part].triggerAttackRelease(
+                        length * frame_in_seconds,    // length
+                        time);    // position
+                },
+                position * frame_in_seconds
+            );
         } else {
-            synths[part].triggerAttackRelease(
-                note,
-                length * frame_in_seconds,    // length
-                1 + position * frame_in_seconds);    // position
+            Tone.Transport.schedule(
+                function (time) {
+                    synths[part].triggerAttackRelease(
+                        note,
+                        length * frame_in_seconds,    // length
+                        time);    // position
+                },
+                position * frame_in_seconds
+            );
         }
     };
 
@@ -64,14 +70,14 @@ function play(segmented) {
         ['p1', 'p2', 'tr', 'no'].forEach(function (part) {
             if (!(part in frame)) {
                 if (last_events[part] != undefined) {
-                    _play_note(part, last_events[part][0], last_events[part][1], last_events[part][2]);
+                    _schedule_note(part, last_events[part][0], last_events[part][1], last_events[part][2]);
                     last_events[part] = undefined;
                     return;
                 }
             } else {
                 if (last_events[part] != undefined) {
                     if (last_events[part][0] != frame[part]) {
-                        _play_note(part, last_events[part][0], last_events[part][1], last_events[part][2]);
+                        _schedule_note(part, last_events[part][0], last_events[part][1], last_events[part][2]);
                         last_events[part] = [frame[part], 1, i];
                     } else {
                         last_events[part] = [frame[part], last_events[part][1] + 1, last_events[part][2]];
@@ -84,4 +90,7 @@ function play(segmented) {
     }
 }
 
-play(segment_music(music));
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('tone-play-toggle').addEventListener('change', e => Tone.Transport.toggle());
+    schedule(segment_music(music));
+});
