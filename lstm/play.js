@@ -31,7 +31,7 @@ export function schedule(segmented) {
                 sustain : 1,
                 release: 0.001
             },
-            volume: -5
+            volume: -8
         }).toMaster()
     }
     // part -> [note, lengths, position]

@@ -1,45 +1,37 @@
-import * as fs from 'fs';
-import * as axios from 'axios';
-import * as tf from '@tensorflow/tfjs';
-
-import {DataSet} from './dataset';
-import {generateText} from './model';
+import {music1, music2, music3, music4, music5} from './music-xformer';
+import {music_mario} from './music-mario';
 
 import {schedule, segment_music} from '/play';
 
-function log(text) {
-    document.getElementById('log').innerHTML += text;
-}
-
-async function run() {
-    log('Loading model and vocabulary ...');
-    const model = await tf.loadLayersModel('model/model.json');
-    const response = await axios.get('model/vocab.json');
-    const vocab = await response.data;
-
-    const sampleLen = model.inputs[0].shape[1];
-    const textData = new DataSet([], sampleLen, 0);
-    textData.vocabulary_ = vocab;
-    const prefix = ['p1:G5', 'p2:E5', 'tr:C4', 'no:C0', 'lf'];
-    const prefixIndices = [];
-    for (let i in prefix) {
-        prefixIndices.push(vocab.indexOf(prefix[i]));
-    }
-    log('Prefix: ' + prefixIndices);
-    log('Generating...');
-
-    function _log_generation(char) {
-        log('Generated: ' + char);
-    }
-
-    generateText(model, textData, prefixIndices, 200, 1.0, _log_generation).then(
-        generated => {
-            schedule(segment_music(generated));
-        }
-    );
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelector('tone-play-toggle').addEventListener('change', e => Tone.Transport.toggle());
-    run();
+    document.getElementById('toggle1').addEventListener('change', e => {
+        Tone.Transport.cancel();
+        schedule(segment_music(music1));
+        Tone.Transport.toggle();
+    });
+    document.getElementById('toggle2').addEventListener('change', e => {
+        Tone.Transport.cancel();
+        schedule(segment_music(music2));
+        Tone.Transport.toggle();
+    });
+    document.getElementById('toggle3').addEventListener('change', e => {
+        Tone.Transport.cancel();
+        schedule(segment_music(music3));
+        Tone.Transport.toggle();
+    });
+    document.getElementById('toggle4').addEventListener('change', e => {
+        Tone.Transport.cancel();
+        schedule(segment_music(music4));
+        Tone.Transport.toggle();
+    });
+    document.getElementById('toggle5').addEventListener('change', e => {
+        Tone.Transport.cancel();
+        schedule(segment_music(music5));
+        Tone.Transport.toggle();
+    });
+    document.getElementById('toggle6').addEventListener('change', e => {
+        Tone.Transport.cancel();
+        schedule(segment_music(music_mario));
+        Tone.Transport.toggle();
+    });
 });
